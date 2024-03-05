@@ -21,10 +21,7 @@ settings = {"user_name": input()
 @app.route('/')
 @app.route('/index')
 def index():
-    session['visits_count'] = session.get('visits_count', 0) + 1
-    print(session['visits_count'])
     return render_template("index.html",
-                           visits=session['visits_count'],
                            css_url=f"{url_for('static', filename='css/style.css')}",
                            title="Главная страница", user_name=settings.get('user_name', 'Аноним'))
 
@@ -34,7 +31,6 @@ def index():
 def return_sample_page():
     db_sess = db_session.create_session()
     users = db_sess.query(User).all()
-    print(users)
     return render_template('users_page.html', title='Список пользователей', users=users)
 
 
