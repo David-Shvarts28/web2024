@@ -19,11 +19,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-
                     <a class="nav-link active" aria-current="page" href="/index">Home</a>
-                    <a class="nav-link" href="/users_page">Список пользователей</a>
                     <a class="nav-link" href="/test_carousel">Карусель</a>
-                    <a class="nav-link" href="/news">Новости</a>
+                    <a class="nav-link" href="/table">Каюта</a>
+                    <a class="nav-link" href="/auto_answer">Данные</a>
                 </div>
             </div>
         </div>
@@ -31,6 +30,11 @@
 </header>
 <!-- Begin page content -->
 <main role="main" class="container">
+    <h1>{{ title1 }}!</h1>
+        <div class="opacity-50">
+            <br>
+            {{title2}}
+        </div>
     <body>
     {% block content %}{% endblock %}
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"

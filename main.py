@@ -1,37 +1,56 @@
-from flask import Flask, url_for, request, render_template, session, redirect
+from flask import Flask, url_for, request, render_template, redirect
 from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField, BooleanField
+from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
-from wtforms import StringField, TextAreaField
-from werkzeug.utils import secure_filename
+from flask import make_response
 
-from data import db_session
-from fill_db import fill_users, get_user
-from data.users import User
-from data.news import News
+class LoginForm(FlaskForm):
+    surname = StringField('Фамилия', validators=[DataRequired()])
+    name = StringField('Имя', validators=[DataRequired()])
+    education = StringField('Образование', validators=[DataRequired()])
+    profession = StringField('Профессия', validators=[DataRequired()])
+    sex = StringField('Пол', validators=[DataRequired()])
+    motivation = StringField('Мотивация', validators=[DataRequired()])
+    ready = StringField('Готовы?', validators=[DataRequired()])
+    submit = SubmitField('Отправить')
 
-DB_NAME = 'site'
+
+class LoginForm1(FlaskForm):
+    gender = StringField('Пол', validators=[DataRequired()])
+    age = StringField('Возраст', validators=[DataRequired()])
+    submit = SubmitField('Отправить')
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 settings = {"user_name": input()
             }
+if len(settings["user_name"]) != 0:
+    user_name = settings["user_name"]
+else:
+    user_name = 'Аноним'
 
 
 @app.route('/')
 @app.route('/index')
 def index():
+    if len(settings["user_name"]) != 0:
+        user_name = settings["user_name"]
+    else:
+        user_name = 'Аноним'
     return render_template("index.html",
                            css_url=f"{url_for('static', filename='css/style.css')}",
-                           title="Главная страница", user_name=settings.get('user_name', 'Аноним'))
+                           title="Главная страница", title1='Миссия Колонизация Марса',
+                           title2='И на Марсе будут яблони цвести!', user_name=user_name)
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response((f"Нет такой страницы, {user_name} "), 404)
 
 
-
-@app.route('/users_page')
-def return_sample_page():
-    db_sess = db_session.create_session()
-    users = db_sess.query(User).all()
-    return render_template('users_page.html', title='Список пользователей', users=users)
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response((f"Нет такой страницы, {user_name} "), 400)
 
 
 @app.route('/test_carousel', methods=['POST', 'GET'])
@@ -46,37 +65,38 @@ def return_carousel():
         settings["avatar_file"] = f.filename
         f.save(f'static/img/{f.filename}')
         settings['pics'].append((f"{url_for('static', filename=f'img/{f.filename}')}", "first"))
-    return render_template('test_carousel.html', title='Карусель', pics=settings['pics'])
+    return render_template('test_carousel.html', title1='Миссия Колонизация Марса', title2='И на Марсе будут яблони цвести!', title='Карусель', pics=settings['pics'])
 
 
-class NewsForm(FlaskForm):
-    title = StringField('Заголовок', validators=[DataRequired()])
-    content = TextAreaField("Содержание")
-    is_private = BooleanField("Личное")
-    submit = SubmitField('Применить')
 
-
-@app.route('/news', methods=['GET', 'POST'])
-def add_news():
-    form = NewsForm()
-    current_user = get_user(DB_NAME)
+@app.route('/table', methods=['GET', 'POST'])
+def table():
+    form = LoginForm1()
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        news = News()
-        news.title = form.title.data
-        news.content = form.content.data
-        news.is_private = form.is_private.data
-        current_user.news.append(news)
-        db_sess.merge(current_user)
-        db_sess.commit()
-        return redirect('/')
-    return render_template('add_news.html', title='Добавление новости',
-                           form=form)
+        gender = request.form['gender']
+        age = int(request.form['age'])
+        return render_template('1.html', title='По каютам!',
+                               title1='Миссия Колонизация Марса', title2='И на Марсе будут яблони цвести!',
+                               gender=gender, age=age)
+    return render_template('3.html', title='Авторизация', title1='Миссия Колонизация Марса',
+                           title2='И на Марсе будут яблони цвести!', form=form)
+
+
+@app.route('/auto_answer', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    d = {}
+    if form.validate_on_submit():
+        d = {"Фамилия": request.form['surname'], "Имя": request.form['name'], "Образование": request.form['education'],
+             "Профессия": request.form['profession'], "Пол": request.form['sex'], "Мотивация": request.form['motivation'],
+             "Готовы?": request.form['ready']}
+        return render_template('2.html', title='Добро пожаловать', title1='Миссия Колонизация Марса',
+                               title2='И на Марсе будут яблони цвести!', d=d)
+    return render_template('auto_answer.html', title='Авторизация', title1='Миссия Колонизация Марса',
+                           title2='И на Марсе будут яблони цвести!', form=form)
 
 
 def main():
-    db_session.global_init(f"db/{DB_NAME}.db")
-    fill_users(DB_NAME)
     app.run(port=8080, host='127.0.0.1')
 
 

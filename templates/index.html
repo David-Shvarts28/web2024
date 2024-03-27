@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% if len(user_name) == 0 %}
+
         <h1>Привет, {{ user_name }}!</h1>
-    {% else %}
-        <h1>Привет, Аноним!</h1>
-    {% endif %}
+
 {% endblock %}
