@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 from flask import make_response
 
+
 class LoginForm(FlaskForm):
     surname = StringField('Фамилия', validators=[DataRequired()])
     name = StringField('Имя', validators=[DataRequired()])
@@ -20,11 +21,11 @@ class LoginForm1(FlaskForm):
     age = StringField('Возраст', validators=[DataRequired()])
     submit = SubmitField('Отправить')
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
-settings = {"user_name": input()
-            }
+settings = {"user_name": input()}
 if len(settings["user_name"]) != 0:
     user_name = settings["user_name"]
 else:
@@ -42,6 +43,7 @@ def index():
                            css_url=f"{url_for('static', filename='css/style.css')}",
                            title="Главная страница", title1='Миссия Колонизация Марса',
                            title2='И на Марсе будут яблони цвести!', user_name=user_name)
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -65,8 +67,8 @@ def return_carousel():
         settings["avatar_file"] = f.filename
         f.save(f'static/img/{f.filename}')
         settings['pics'].append((f"{url_for('static', filename=f'img/{f.filename}')}", "first"))
-    return render_template('test_carousel.html', title1='Миссия Колонизация Марса', title2='И на Марсе будут яблони цвести!', title='Карусель', pics=settings['pics'])
-
+    return render_template('test_carousel.html', title1='Миссия Колонизация Марса',
+                           title2='И на Марсе будут яблони цвести!', title='Карусель', pics=settings['pics'])
 
 
 @app.route('/table', methods=['GET', 'POST'])
@@ -88,7 +90,8 @@ def login():
     d = {}
     if form.validate_on_submit():
         d = {"Фамилия": request.form['surname'], "Имя": request.form['name'], "Образование": request.form['education'],
-             "Профессия": request.form['profession'], "Пол": request.form['sex'], "Мотивация": request.form['motivation'],
+             "Профессия": request.form['profession'], "Пол": request.form['sex'],
+             "Мотивация": request.form['motivation'],
              "Готовы?": request.form['ready']}
         return render_template('2.html', title='Добро пожаловать', title1='Миссия Колонизация Марса',
                                title2='И на Марсе будут яблони цвести!', d=d)
